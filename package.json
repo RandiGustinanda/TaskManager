@@ -24,6 +24,7 @@
     "dependencies": {
         "aos": "^2.3.4",
         "gsap": "^3.13.0",
-        "lucide-react": "^0.509.0"
+        "lucide-react": "^0.509.0",
+        "react-toastify": "^11.0.5"
     }
 }
