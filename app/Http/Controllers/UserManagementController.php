@@ -12,8 +12,16 @@ class UserManagementController extends Controller
     public function index()
     {
         $users = User::orderBy('name')->get();
+
+        // Ambil audit yang berkaitan dengan model User
+        $audits = Audit::where('auditable_type', User::class)
+            ->orderBy('created_at', 'desc')
+            ->with('user') // untuk ambil siapa yang melakukan
+            ->get();
+
         return inertia('admin/usermanagement', [
-            'users' => $users
+            'users' => $users,
+            'audits' => $audits
         ]);
     }
 
@@ -73,8 +81,9 @@ class UserManagementController extends Controller
             'url' => url()->current()
         ]);
 
-        return inertia('admin/usermanagement', [
-            'users' => User::orderBy('name')->get()
+        return response()->json([
+            'message' => 'Role updated successfully',
+            'user' => $user
         ]);
     }
 }

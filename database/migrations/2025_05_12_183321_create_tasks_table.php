@@ -12,11 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('tasks', function (Blueprint $table) {
             $table->uuid('id')->primary()->default(Str::uuid());
-            $table->string('name');
+            $table->foreignUuid('project_id')->constrained()->onDelete('cascade'); // Ganti menjadi foreignUuid
+            $table->string('title');
             $table->text('description')->nullable();
-            $table->foreignUuid('created_by')->constrained('users'); // Ganti menjadi foreignUuid
+            $table->foreignUuid('assigned_to')->nullable()->constrained('users'); // Ganti menjadi foreignUuid
+            $table->string('attachment')->nullable(); // path file PDF
             $table->softDeletes(); // Soft delete
             $table->timestamps();
         });
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('tasks');
     }
 };

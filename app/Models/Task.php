@@ -2,30 +2,28 @@
 
 namespace App\Models;
 
-use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-class Project extends Model implements Auditable
+
+class Task extends Model
 {
-    use SoftDeletes;
-    use \OwenIt\Auditing\Auditable;
     protected $keyType = 'string';
     public $incrementing = false;
     protected $fillable = [
-        'name',
+        'title',
+        'assigned_to',
         'description',
-        'created_by',
+        'deadline',
+        'project_id',
     ];
-
-    public function creator()
+    public function project()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(Project::class);
     }
 
-    public function tasks()
+    public function member()
     {
-        return $this->hasMany(Task::class);
+        return $this->belongsTo(User::class, 'assigned_to',);
     }
     protected static function boot()
     {
