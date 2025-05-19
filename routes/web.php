@@ -46,6 +46,8 @@ Route::middleware([
     Route::get('/projects/{project}/tasks', [TaskController::class, 'index'])->name('projects.tasks.index');
     Route::get('/projects/{project}/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
     Route::post('/projects/{project}/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}/status', [TaskController::class, 'updateStatus'])
+    ->name('tasks.updateStatus');
 });
 
 Route::middleware([
@@ -54,6 +56,7 @@ Route::middleware([
 ])->group(function () {
     Route::get('/tugas', [TugasController::class, 'index'])->name('tugas.index');
     Route::post('/tasks/{task}/upload', [TugasController::class, 'uploadAttachment'])->name('tasks.upload');
+    Route::post('/tasks/{id}/update-notes', [TugasController::class, 'updateNotes']);
 });
 
 require __DIR__ . '/auth.php';

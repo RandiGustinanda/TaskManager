@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-   use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Storage;
+
 class TugasController extends Controller
 {
     public function index()
@@ -20,7 +21,7 @@ class TugasController extends Controller
         ]);
     }
 
- 
+
 
     public function uploadAttachment(Request $request, Task $task)
     {
@@ -39,5 +40,22 @@ class TugasController extends Controller
         }
 
         return redirect()->back()->with('success', 'File berhasil diunggah.');
+    }
+
+    public function updateNotes(Request $request, $id)
+    {
+        $request->validate([
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $task = Task::findOrFail($id);
+
+        $option = $task->option ?? [];
+        $option['notes'] = $request->input('notes');
+
+        $task->option = $option;
+        $task->save();
+
+        return response()->json(['message' => 'Catatan berhasil disimpan']);
     }
 }

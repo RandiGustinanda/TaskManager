@@ -8,7 +8,7 @@ use App\Models\Project;
 use App\Models\User;
 use App\Models\Task;
 use Illuminate\Support\Facades\Log;
-
+use OwenIt\Auditing\Models\Audit;
 class TaskController extends Controller
 {
     public function index(Project $project)
@@ -18,9 +18,16 @@ class TaskController extends Controller
             ->paginate(5) // kamu bisa ubah jumlah per halaman
             ->withQueryString(); // agar query tetap saat pindah halaman
 
+        $activity = Audit::with('auditable') // ambil relasi user dan project
+            ->where('auditable_type', Task::class)
+            ->latest()
+            ->take(20) // batasi jumlah history jika perlu
+            ->get();
+            
         return inertia('Task/Index', [
             'project' => $project,
             'tasks' => $tasks,
+            'activity' => $activity
         ]);
     }
 
@@ -50,5 +57,16 @@ class TaskController extends Controller
         \App\Models\Task::create($validated);
 
         return redirect()->route('projects.tasks.index', $project->id)->with('success', 'Task created.');
+    }
+
+    public function updateStatus($taskId)
+    {
+        $task = Task::find($taskId);
+        if ($task) {
+            $task->status = true;
+            $task->save();
+        }
+
+        return redirect()->back();
     }
 }

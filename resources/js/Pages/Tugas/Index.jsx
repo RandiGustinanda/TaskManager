@@ -7,11 +7,12 @@ export default function TaskIndex() {
     const { tasks } = usePage().props;
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState(null);
+    const [notes, setNotes] = useState({}); // Menyimpan notes per task
 
     const handleUpload = async (e, taskId) => {
         const file = e.target.files[0];
-
         if (!file) return;
+
         if (file.type !== 'application/pdf') {
             setError("Hanya file PDF yang diperbolehkan.");
             return;
@@ -29,16 +30,28 @@ export default function TaskIndex() {
 
         try {
             await axios.post(`/tasks/${taskId}/upload`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
-
-            window.location.reload(); // Refresh data setelah upload
+            window.location.reload();
         } catch (err) {
             setError("Gagal upload. Periksa kembali file kamu.");
         } finally {
             setUploading(false);
+        }
+    };
+
+    const handleNoteChange = (taskId, value) => {
+        setNotes((prev) => ({ ...prev, [taskId]: value }));
+    };
+
+    const saveNote = async (taskId) => {
+        try {
+            await axios.post(`/tasks/${taskId}/update-notes`, {
+                notes: notes[taskId] || '',
+            });
+            alert("Catatan berhasil disimpan!");
+        } catch (err) {
+            alert("Gagal menyimpan catatan.");
         }
     };
 
@@ -72,6 +85,22 @@ export default function TaskIndex() {
                                             Sudah diunggah: <a href={`/storage/${task.attachment}`} target="_blank" className="underline">Lihat File</a>
                                         </p>
                                     )}
+                                </div>
+
+                                <div className="mt-4">
+                                    <label className="block text-sm font-medium mb-1">Catatan:</label>
+                                    <textarea
+                                        className="w-full border rounded p-2 text-sm"
+                                        rows={3}
+                                        value={notes[task.id] ?? task.option?.notes ?? ''}
+                                        onChange={(e) => handleNoteChange(task.id, e.target.value)}
+                                    />
+                                    <button
+                                        className="mt-2 px-4 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                                        onClick={() => saveNote(task.id)}
+                                    >
+                                        Simpan Catatan
+                                    </button>
                                 </div>
                             </div>
                         ))}

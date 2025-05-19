@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
-class Task extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
+class Task extends Model implements Auditable
 {
+    use SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
     protected $keyType = 'string';
     public $incrementing = false;
     protected $fillable = [
@@ -15,7 +19,12 @@ class Task extends Model
         'description',
         'deadline',
         'project_id',
+        'option'
     ];
+    protected $casts = [
+        'option' => 'array', // Membuat 'option' menjadi array saat diakses
+    ];
+    
     public function project()
     {
         return $this->belongsTo(Project::class);
